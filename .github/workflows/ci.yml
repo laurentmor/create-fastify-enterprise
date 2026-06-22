@@ -54,9 +54,10 @@ jobs:
       # substituted.
       - name: Self-test — generate a project and typecheck it
         run: |
-          node dist/index.js /tmp/smoke-app --license MIT --package-manager npm \
+          cd /tmp
+          node ${GITHUB_WORKSPACE}/dist/index.js /tmp/smoke-app --license MIT --package-manager npm \
             --author "CI" --no-install --no-git --yes
-          cd /tmp/smoke-app
+          cd smoke-app
           npm install
           npx tsc --noEmit
           npx eslint .
@@ -68,4 +69,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: REUSE Compliance Check
-        uses: fsfe/reuse-action@v5
+        uses: fsfe/reuse-action@v4
