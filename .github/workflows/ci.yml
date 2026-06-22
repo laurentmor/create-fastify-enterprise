@@ -9,7 +9,13 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  # Write permissions for the repository contents and pull requests
+  # This allows the workflow to update the pull request status and commit
+  # to the repository if needed (e.g., for auto-formatting or version bumps).
+  # release-please-bot doesn't need these permissions,
+  # but they are generally useful for CI workflows.
+  contents: write
+  pull-requests: write
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
