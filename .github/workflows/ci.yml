@@ -45,7 +45,7 @@ jobs:
         run: bun run typecheck
 
       - name: Format check
-        run: bun run format:check
+        run: bun run format
 
       - name: Test with coverage
         run: bun run coverage
