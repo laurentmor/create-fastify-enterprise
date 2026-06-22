@@ -4,3 +4,7 @@ node_modules
 templates
 LICENSES
 *.md
+bun.lock
+bun.lockb
+pnpm-lock.yaml
+package-lock.json
