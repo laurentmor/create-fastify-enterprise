@@ -1,0 +1,6 @@
+dist
+coverage
+node_modules
+templates
+LICENSES
+*.md

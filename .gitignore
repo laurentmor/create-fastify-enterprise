@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+*.log
+.DS_Store
+*.tsbuildinfo
+.env
+# scratch dirs used while testing the generator locally
+/tmp-test-*

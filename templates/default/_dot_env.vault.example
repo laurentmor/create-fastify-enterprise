@@ -1,0 +1,8 @@
+# Naming convention used when secrets are injected by a Vault Agent sidecar
+# instead of a static .env file. See .vault/agent-config.hcl and README.md
+# ("Vault-ready configuration") for the full setup.
+#
+# This file documents the keys the Vault Agent template renders into
+# /vault/secrets/app.env at runtime. It is NOT loaded automatically — it is
+# here for reference and for local emulation of the Vault-rendered file.
+MONGO_URI=mongodb://__inject-from-vault__

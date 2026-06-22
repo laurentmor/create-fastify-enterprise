@@ -1,0 +1,56 @@
+# SPDX-FileCopyrightText: __YEAR__ __AUTHOR__
+# __SPDX_ID_LINE__
+#
+# Local dev stack. `docker compose up mongo` is usually enough day-to-day —
+# run the app itself with __RUN__ dev for fast TS reloads. The `app` and
+# `vault` services are here for testing the production image / Vault wiring
+# end-to-end.
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Dev-mode Vault server — unsealed, in-memory, root token "root".
+  # Never use `vault server -dev` outside local development.
+  vault:
+    image: hashicorp/vault:1.18
+    restart: unless-stopped
+    ports:
+      - '8200:8200'
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: root
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+    cap_add:
+      - IPC_LOCK
+    profiles:
+      - vault
+
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      MONGO_URI: mongodb://mongo:27017/__PROJECT_NAME__
+      CORS_ORIGIN: '*'
+    depends_on:
+      mongo:
+        condition: service_healthy
+    profiles:
+      - app
+
+volumes:
+  mongo-data:

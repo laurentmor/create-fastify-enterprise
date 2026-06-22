@@ -1,0 +1,32 @@
+version = 1
+SPDX-PackageName = "__PROJECT_NAME__"
+SPDX-PackageSupplier = "__AUTHOR__"
+SPDX-PackageDownloadLocation = "NOASSERTION"
+
+# Files that cannot carry an in-file SPDX header (JSON has no comment
+# syntax, lockfiles are generated, etc.) are licensed here instead, per
+# the REUSE specification: https://reuse.software/spec/
+[[annotations]]
+path = [
+  "package.json",
+  "package-lock.json",
+  "tsconfig.json",
+  "tsconfig.build.json",
+  "release-please-config.json",
+  ".release-please-manifest.json",
+  ".lintstagedrc",
+  ".prettierrc",
+  "openapi/openapi.json",
+]
+SPDX-FileCopyrightText = "__YEAR__ __AUTHOR__"
+SPDX-License-Identifier = "__SPDX_LICENSE__"
+
+[[annotations]]
+path = ["CHANGELOG.md", "README.md"]
+SPDX-FileCopyrightText = "__YEAR__ __AUTHOR__"
+SPDX-License-Identifier = "__SPDX_LICENSE__"
+
+[[annotations]]
+path = [".nvmrc", ".gitignore", ".prettierignore", ".env.example", ".env.vault.example"]
+SPDX-FileCopyrightText = "__YEAR__ __AUTHOR__"
+SPDX-License-Identifier = "__SPDX_LICENSE__"

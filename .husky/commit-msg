@@ -1,0 +1,4 @@
+# SPDX-FileCopyrightText: 2025 Your Org
+# SPDX-License-Identifier: MIT
+
+npx --no -- commitlint --edit "$1"

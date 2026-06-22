@@ -1,0 +1,71 @@
+# SPDX-FileCopyrightText: 2025 Your Org
+# SPDX-License-Identifier: MIT
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-test:
+    name: Lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # No bun.lock is committed yet (this CLI was scaffolded in an
+      # environment without bun installed) — once one exists, switch this
+      # to `bun install --frozen-lockfile` for reproducible installs.
+      - run: bun install
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Format check
+        run: bun run format:check
+
+      - name: Test with coverage
+        run: bun run coverage
+
+      - name: Build
+        run: bun run build
+
+      # Smoke test the *actual built artifact*: scaffold a project with
+      # every toggle exercised and make sure tsc/eslint pass on the
+      # result. Catches the class of bug unit tests miss — a template
+      # file that's syntactically broken until placeholders are
+      # substituted.
+      - name: Self-test — generate a project and typecheck it
+        run: |
+          node dist/index.js /tmp/smoke-app --license MIT --package-manager npm \
+            --author "CI" --no-install --no-git --yes
+          cd /tmp/smoke-app
+          npm install
+          npx tsc --noEmit
+          npx eslint .
+          npx prettier --check .
+
+  reuse-compliance:
+    name: REUSE / SPDX compliance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: REUSE Compliance Check
+        uses: fsfe/reuse-action@v5

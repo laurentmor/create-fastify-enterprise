@@ -1,0 +1,133 @@
+# SPDX-FileCopyrightText: __YEAR__ __AUTHOR__
+# __SPDX_ID_LINE__
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-test:
+    name: Lint, typecheck, test
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      # [[FEATURE:pmBun:start]]
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      # [[FEATURE:pmBun:end]]
+      # [[FEATURE:pmNpm:start]]
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      # [[FEATURE:pmNpm:end]]
+      # [[FEATURE:pmPnpm:start]]
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      # [[FEATURE:pmPnpm:end]]
+
+      - name: Install dependencies
+        run: __INSTALL__
+
+      - name: Lint
+        run: __RUN__ lint
+
+      - name: Typecheck
+        run: __RUN__ typecheck
+
+      - name: Format check
+        run: __RUN__ format:check
+
+      - name: Test with coverage
+        env:
+          # When set, test/test-utils.ts connects here directly instead of
+          # downloading a mongod binary via mongodb-memory-server — keeps
+          # CI working on runners with restricted internet access.
+          MONGO_URI: mongodb://127.0.0.1:27017/ci
+        run: __RUN__ coverage
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage
+          retention-days: 14
+
+      - name: Build
+        run: __RUN__ build
+
+  reuse-compliance:
+    name: REUSE / SPDX compliance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: REUSE Compliance Check
+        uses: fsfe/reuse-action@v5
+
+  openapi:
+    name: Validate OpenAPI document
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+    steps:
+      - uses: actions/checkout@v4
+
+      # [[FEATURE:pmBun:start]]
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      # [[FEATURE:pmBun:end]]
+      # [[FEATURE:pmNpm:start]]
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      # [[FEATURE:pmNpm:end]]
+      # [[FEATURE:pmPnpm:start]]
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      # [[FEATURE:pmPnpm:end]]
+
+      - run: __INSTALL__
+      - name: Generate OpenAPI document
+        run: __RUN__ openapi:generate
+      - uses: actions/upload-artifact@v4
+        with:
+          name: openapi-spec
+          path: openapi/openapi.json
