@@ -74,7 +74,7 @@ jobs:
           npm install
           npx tsc --noEmit
           npx eslint .
-          npx prettier --check .
+          npx prettier --check --write .
 
   reuse-compliance:
     name: REUSE / SPDX compliance
