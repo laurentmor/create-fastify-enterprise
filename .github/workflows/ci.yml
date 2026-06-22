@@ -52,10 +52,17 @@ jobs:
       # result. Catches the class of bug unit tests miss — a template
       # file that's syntactically broken until placeholders are
       # substituted.
+      #
+      # IMPORTANT: cd to a temp dir *before* invoking the CLI so the
+      # project-name argument is a bare slug ("smoke-app"), not a path
+      # with slashes ("/tmp/smoke-app"). The generator's name validator
+      # enforces URL-friendly characters and rejects anything containing
+      # a path separator.
       - name: Self-test — generate a project and typecheck it
         run: |
           cd /tmp
-          node ${GITHUB_WORKSPACE}/dist/index.js /tmp/smoke-app --license MIT --package-manager npm \
+          node $GITHUB_WORKSPACE/dist/index.js smoke-app \
+            --license MIT --package-manager npm \
             --author "CI" --no-install --no-git --yes
           cd smoke-app
           npm install
