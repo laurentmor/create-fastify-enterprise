@@ -3,17 +3,22 @@ SPDX-PackageName = "create-fastify-enterprise"
 SPDX-PackageSupplier = "Your Org"
 SPDX-PackageDownloadLocation = "https://github.com/your-org/create-fastify-enterprise"
 
-# Files that can't carry an in-file SPDX header (JSON has no comments,
-# lockfiles are generated, etc.).
+# Files that can't carry an in-file SPDX header (JSON/TOML have no comments,
+# lockfiles are machine-generated, etc.).
 [[annotations]]
 path = [
   "package.json",
   "package-lock.json",
+  "bun.lock",
+  "bun.lockb",
+  "pnpm-lock.yaml",
   "tsconfig.json",
   ".lintstagedrc.json",
   ".prettierrc.json",
   "release-please-config.json",
   ".release-please-manifest.json",
+  # REUSE.toml itself cannot carry an in-file header
+  "REUSE.toml",
 ]
 SPDX-FileCopyrightText = "2025 Your Org"
 SPDX-License-Identifier = "MIT"
@@ -24,7 +29,7 @@ SPDX-FileCopyrightText = "2025 Your Org"
 SPDX-License-Identifier = "MIT"
 
 # Everything under templates/ is its own REUSE-compliant project (see
-# templates/default/REUSE.toml) generated *for end users* — its files carry
+# templates/default/_REUSE.toml) generated *for end users* — its files carry
 # __PLACEHOLDER__ tokens until scaffolded, so they're annotated here instead
 # of relying on in-file headers being parsed literally.
 [[annotations]]
