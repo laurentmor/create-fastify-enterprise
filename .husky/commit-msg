@@ -1,4 +1,25 @@
+#!/bin/sh
 # SPDX-FileCopyrightText: 2025 Your Org
 # SPDX-License-Identifier: MIT
 
-npx --no -- commitlint --edit "$1"
+set -euo pipefail
+
+MSG_FILE="$1"
+if [ -z "${MSG_FILE:-}" ] || [ ! -f "$MSG_FILE" ]; then
+	echo "Commit hook: missing commit message file." >&2
+	exit 1
+fi
+
+# Reject empty commit messages
+if [ -z "$(sed -n '1p' "$MSG_FILE" | tr -d '[:space:]')" ]; then
+	echo "Aborting commit: commit message is empty." >&2
+	exit 1
+fi
+
+# Run commitlint (conventional commits)
+npx --no -- commitlint --edit "$MSG_FILE" || {
+	echo "commitlint failed — please follow conventional commits (see CONTRIBUTING)." >&2
+	exit 1
+}
+
+echo "Commit message passed commitlint."
