@@ -1,6 +1,6 @@
 {
   "name": "create-fastify-enterprise",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Scaffold enterprise-grade Fastify + TypeBox + MongoDB/Mongoose services with CI/CD, OpenAPI, Vault-ready config and SPDX/REUSE compliance out of the box.",
   "license": "MIT",
   "type": "module",
